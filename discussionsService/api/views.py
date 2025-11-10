@@ -43,7 +43,11 @@ def discussion_detail(request, pk):
 @api_view(['GET', 'POST'])
 def comment_list_create(request):
 	if request.method == 'GET':
-		comments = Comment.objects.all().order_by('-created_at')
+		discussion_id = request.GET.get('discussion')
+		qs = Comment.objects.all()
+		if discussion_id:
+			qs = qs.filter(discussion_id=discussion_id)
+		comments = qs.order_by('-created_at')
 		serializer = CommentSerializer(comments, many=True)
 		return Response(serializer.data)
 	elif request.method == 'POST':
