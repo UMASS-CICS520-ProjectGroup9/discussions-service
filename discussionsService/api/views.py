@@ -115,7 +115,7 @@ def course_discussion_detail(request, pk):
 	elif request.method == 'DELETE':
 		discussion.delete()
 		return Response(status=status.HTTP_204_NO_CONTENT)
-@api_view(['GET'])
+@api_view(['GET', 'DELETE'])
 def course_discussion_by_course_info(request, course_subject, course_id):
     try:
         discussion = CourseDiscussion.objects.get(course_subject=course_subject, course_id=course_id)
@@ -125,6 +125,9 @@ def course_discussion_by_course_info(request, course_subject, course_id):
     if request.method == 'GET':
         serializer = CourseDiscussionSerializer(discussion)
         return Response(serializer.data)
+    elif request.method == 'DELETE':
+        discussion.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 # Course Comment Views
 @api_view(['GET', 'POST'])
