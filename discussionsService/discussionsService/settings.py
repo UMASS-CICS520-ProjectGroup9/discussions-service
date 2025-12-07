@@ -32,8 +32,17 @@ SECRET_KEY = "Umass-CSCI520-FinalProject-Group9-Discussions"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
 
+ALLOWED_HOSTS = ['isolweb.pythonanywhere.com']
+STATIC_ROOT = '/home/isolweb/discussions-service/static/'
+
+SECRET_KEY = 'Umass-CSCI520-FinalProject-Group9'
+
+
+SIMPLE_JWT = {
+   "ALGORITHM": "HS256",
+   "SIGNING_KEY": 'Umass-CSCI520-FinalProject-Group9',
+}
 
 # Application definition
 
@@ -47,8 +56,17 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "base.apps.BaseConfig",
+    "rest_framework_simplejwt",
 ]
-# JWT settings for compatibility with professors-service
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'discussionsService.authentication.ExternalJWTAuthentication',
+    ],
+    # "DEFAULT_PERMISSION_CLASSES": [
+    #     "rest_framework.permissions.IsAuthenticated",
+    #     # "base.permissions.IsOwnerOrAdmin"
+    # ],
+}# JWT settings for compatibility with professors-service
 SIMPLE_JWT = {
     'ALGORITHM': 'HS256',
     'SIGNING_KEY': SECRET_KEY,
