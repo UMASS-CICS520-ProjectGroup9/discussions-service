@@ -15,7 +15,16 @@ def discussion_list_create(request):
 	elif request.method == 'POST':
 		serializer = DiscussionSerializer(data=request.data)
 		if serializer.is_valid():
-			serializer.save()
+			# if client provided creator_id (from website session), persist it
+			creator = request.data.get('creator_id')
+			if creator is not None:
+				try:
+					creator = int(creator)
+				except (TypeError, ValueError):
+					creator = None
+				serializer.save(creator_id=creator)
+			else:
+				serializer.save()
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -53,7 +62,15 @@ def comment_list_create(request):
 	elif request.method == 'POST':
 		serializer = CommentSerializer(data=request.data)
 		if serializer.is_valid():
-			serializer.save()
+			creator = request.data.get('creator_id')
+			if creator is not None:
+				try:
+					creator = int(creator)
+				except (TypeError, ValueError):
+					creator = None
+				serializer.save(creator_id=creator)
+			else:
+				serializer.save()
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
