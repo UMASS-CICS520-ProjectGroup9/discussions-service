@@ -45,6 +45,22 @@ def discussion_detail(request, pk):
 			return Response(serializer.data)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 	elif request.method == 'DELETE':
+		# Owner-only delete enforcement
+		# Expect client to provide X-User-ID header (sent from website service)
+		requester_id = request.headers.get('X-User-ID')
+		creator_id = discussion.creator_id
+		# If we have a creator_id recorded, require it to match the requester
+		if creator_id is not None:
+			try:
+				creator_id_int = int(creator_id)
+			except (TypeError, ValueError):
+				creator_id_int = None
+			try:
+				requester_id_int = int(requester_id) if requester_id is not None else None
+			except (TypeError, ValueError):
+				requester_id_int = None
+			if creator_id_int is None or requester_id_int is None or creator_id_int != requester_id_int:
+				return Response({'error': 'Forbidden: only the creator can delete this discussion.'}, status=status.HTTP_403_FORBIDDEN)
 		discussion.delete()
 		return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -91,5 +107,19 @@ def comment_detail(request, pk):
 			return Response(serializer.data)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 	elif request.method == 'DELETE':
+		# Owner-only delete enforcement for comments
+		requester_id = request.headers.get('X-User-ID')
+		creator_id = comment.creator_id
+		if creator_id is not None:
+			try:
+				creator_id_int = int(creator_id)
+			except (TypeError, ValueError):
+				creator_id_int = None
+			try:
+				requester_id_int = int(requester_id) if requester_id is not None else None
+			except (TypeError, ValueError):
+				requester_id_int = None
+			if creator_id_int is None or requester_id_int is None or creator_id_int != requester_id_int:
+				return Response({'error': 'Forbidden: only the creator can delete this comment.'}, status=status.HTTP_403_FORBIDDEN)
 		comment.delete()
 		return Response(status=status.HTTP_204_NO_CONTENT)
