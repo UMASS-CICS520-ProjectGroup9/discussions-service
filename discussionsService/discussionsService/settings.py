@@ -33,7 +33,7 @@ SECRET_KEY = "Umass-CSCI520-FinalProject-Group9-Discussions"
 DEBUG = True
 
 
-ALLOWED_HOSTS = ['isolweb.pythonanywhere.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'isolweb.pythonanywhere.com']
 STATIC_ROOT = '/home/isolweb/discussions-service/static/'
 
 SECRET_KEY = 'Umass-CSCI520-FinalProject-Group9'
@@ -56,7 +56,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "base.apps.BaseConfig",
-    "rest_framework_simplejwt",
 ]
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
