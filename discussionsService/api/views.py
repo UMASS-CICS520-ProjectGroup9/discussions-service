@@ -14,15 +14,19 @@ def discussion_list_create(request):
 		serializer = DiscussionSerializer(discussions, many=True)
 		return Response(serializer.data)
 	elif request.method == 'POST':
-		serializer = DiscussionSerializer(data=request.data)
+		# coerce creator_id before serializer validation so string values won't fail
+		data = request.data.copy()
+		creator = data.get('creator_id')
+		if creator is not None:
+			try:
+				data['creator_id'] = int(creator)
+			except (TypeError, ValueError):
+				data['creator_id'] = None
+
+		serializer = DiscussionSerializer(data=data)
 		if serializer.is_valid():
-			# if client provided creator_id (from website session), persist it
-			creator = request.data.get('creator_id')
+			creator = data.get('creator_id')
 			if creator is not None:
-				try:
-					creator = int(creator)
-				except (TypeError, ValueError):
-					creator = None
 				serializer.save(creator_id=creator)
 			else:
 				serializer.save()
@@ -41,6 +45,10 @@ def discussion_detail(request, pk):
 		serializer = DiscussionSerializer(discussion)
 		return Response(serializer.data)
 	elif request.method == 'PUT':
+		# enforce owner or admin for mutating operations
+		if not (discussion.creator_id == getattr(request.user, 'id', None) or getattr(request.user, 'role', '').upper() == 'ADMIN'):
+			return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+
 		serializer = DiscussionSerializer(discussion, data=request.data)
 		if serializer.is_valid():
 			serializer.save()
@@ -60,19 +68,31 @@ def comment_list_create(request):
 		discussion_id = request.GET.get('discussion')
 		qs = Comment.objects.all()
 		if discussion_id:
-			qs = qs.filter(discussion_id=discussion_id)
+			# guard against non-integer discussion ids provided by clients
+			try:
+				q_id = int(discussion_id)
+				qs = qs.filter(discussion_id=q_id)
+			except (TypeError, ValueError):
+				# return empty set for invalid ids instead of raising
+				qs = qs.none()
 		comments = qs.order_by('-created_at')
 		serializer = CommentSerializer(comments, many=True)
 		return Response(serializer.data)
 	elif request.method == 'POST':
-		serializer = CommentSerializer(data=request.data)
+		# copy and coerce incoming data so serializer validation won't fail on bad creator_id
+		data = request.data.copy()
+		creator = data.get('creator_id')
+		if creator is not None:
+			try:
+				data['creator_id'] = int(creator)
+			except (TypeError, ValueError):
+				# normalize invalid creator ids to None
+				data['creator_id'] = None
+
+		serializer = CommentSerializer(data=data)
 		if serializer.is_valid():
-			creator = request.data.get('creator_id')
+			creator = data.get('creator_id')
 			if creator is not None:
-				try:
-					creator = int(creator)
-				except (TypeError, ValueError):
-					creator = None
 				serializer.save(creator_id=creator)
 			else:
 				serializer.save()
@@ -91,6 +111,10 @@ def comment_detail(request, pk):
 		serializer = CommentSerializer(comment)
 		return Response(serializer.data)
 	elif request.method == 'PUT':
+		# enforce owner or admin for mutating operations
+		if not (comment.creator_id == getattr(request.user, 'id', None) or getattr(request.user, 'role', '').upper() == 'ADMIN'):
+			return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+
 		serializer = CommentSerializer(comment, data=request.data)
 		if serializer.is_valid():
 			serializer.save()
