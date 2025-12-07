@@ -25,8 +25,17 @@ SECRET_KEY = "django-insecure-55x%k%qdj^rob40t#cw)h3f9m@_=%mi_^75bz$$vf6gb&2$vn4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
 
+ALLOWED_HOSTS = ['isolweb.pythonanywhere.com']
+STATIC_ROOT = '/home/isolweb/discussions-service/static/'
+
+SECRET_KEY = 'Umass-CSCI520-FinalProject-Group9'
+
+
+SIMPLE_JWT = {
+   "ALGORITHM": "HS256",
+   "SIGNING_KEY": 'Umass-CSCI520-FinalProject-Group9',
+}
 
 # Application definition
 
@@ -39,8 +48,17 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "base.apps.BaseConfig",
+    "rest_framework_simplejwt",
 ]
-
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'discussionsService.authentication.ExternalJWTAuthentication',
+    ],
+    # "DEFAULT_PERMISSION_CLASSES": [
+    #     "rest_framework.permissions.IsAuthenticated",
+    #     # "base.permissions.IsOwnerOrAdmin"
+    # ],
+}
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
