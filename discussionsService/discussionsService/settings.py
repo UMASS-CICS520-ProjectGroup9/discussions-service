@@ -1,3 +1,10 @@
+# Django REST Framework authentication settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+}
 """
 Django settings for discussionsService project.
 
@@ -20,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-55x%k%qdj^rob40t#cw)h3f9m@_=%mi_^75bz$$vf6gb&2$vn4"
+SECRET_KEY = "Umass-CSCI520-FinalProject-Group9-Discussions"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -38,8 +45,14 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "rest_framework_simplejwt",
     "base.apps.BaseConfig",
 ]
+# JWT settings for compatibility with professors-service
+SIMPLE_JWT = {
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

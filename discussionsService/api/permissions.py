@@ -6,7 +6,9 @@ class IsAdmin(BasePermission):
 
 class IsStudent(BasePermission):
     def has_permission(self, request, view):
-        return (request.user.role == "STUDENT") or (request.user.role == "ADMIN") or (request.user.role == "STAFF")
+        user = request.user
+        print(f"[DEBUG] IsStudent: user={user}, is_authenticated={user.is_authenticated}, role={getattr(user, 'role', None)}")
+        return user.is_authenticated and (getattr(user, 'role', None) in ["STUDENT", "ADMIN", "STAFF"])
 
 class IsStaff(BasePermission):
     def has_permission(self, request, view):
