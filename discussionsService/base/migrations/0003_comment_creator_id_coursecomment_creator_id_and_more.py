@@ -11,11 +11,6 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name='comment',
-            name='creator_id',
-            field=models.IntegerField(blank=True, null=True),
-        ),
-        migrations.AddField(
             model_name='coursecomment',
             name='creator_id',
             field=models.IntegerField(blank=True, null=True),
@@ -25,9 +20,5 @@ class Migration(migrations.Migration):
             name='creator_id',
             field=models.IntegerField(blank=True, null=True),
         ),
-        migrations.AddField(
-            model_name='discussion',
-            name='creator_id',
-            field=models.IntegerField(blank=True, null=True),
-        ),
+        
     ]
