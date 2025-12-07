@@ -1,12 +1,15 @@
 
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from base.models import Discussion, Comment
 from .serializers import DiscussionSerializer, CommentSerializer
+from .permissions import IsAdmin, IsStudent, IsStaff, IsOwnerOrAdmin
 
 # Discussion Views
 @api_view(['GET', 'POST'])
+@permission_classes([AllowAny])
 def discussion_list_create(request):
 	if request.method == 'GET':
 		discussions = Discussion.objects.all().order_by('-created_at')
@@ -29,6 +32,7 @@ def discussion_list_create(request):
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([AllowAny])
 def discussion_detail(request, pk):
 	try:
 		discussion = Discussion.objects.get(pk=pk)
@@ -66,6 +70,7 @@ def discussion_detail(request, pk):
 
 # Comment Views
 @api_view(['GET', 'POST'])
+@permission_classes([AllowAny])
 def comment_list_create(request):
 	if request.method == 'GET':
 		discussion_id = request.GET.get('discussion')
@@ -91,6 +96,7 @@ def comment_list_create(request):
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([AllowAny])
 def comment_detail(request, pk):
 	try:
 		comment = Comment.objects.get(pk=pk)
