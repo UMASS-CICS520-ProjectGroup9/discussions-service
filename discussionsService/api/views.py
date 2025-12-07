@@ -175,7 +175,7 @@ def course_discussion_detail(request, pk):
         return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
 
 @api_view(['GET', 'DELETE'])
-@permission_classes([IsOwnerOrAdmin])
+@permission_classes([IsStudent])
 def course_discussion_by_course_info(request, course_subject, course_id):
     try:
         discussion = CourseDiscussion.objects.get(course_subject=course_subject, course_id=course_id)
