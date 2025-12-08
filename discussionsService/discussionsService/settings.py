@@ -33,8 +33,8 @@ SECRET_KEY = "Umass-CSCI520-FinalProject-Group9-Discussions"
 DEBUG = True
 
 
-ALLOWED_HOSTS = ['127.0.0.1', 'isolweb.pythonanywhere.com']
-STATIC_ROOT = '/home/isolweb/discussions-service/static/'
+ALLOWED_HOSTS = ['127.0.0.1', 'isoulweb.pythonanywhere.com']
+STATIC_ROOT = '/home/isoulweb/discussions-service/static/'
 
 SECRET_KEY = 'Umass-CSCI520-FinalProject-Group9'
 
