@@ -76,11 +76,9 @@ def discussion_detail(request, pk):
 			discussion.creator_id,
 		)
 		# allow only the creator or an admin to delete
-		if discussion.creator_id == getattr(request.user, 'id', None) or getattr(request.user, 'role', '').upper() == 'ADMIN':
-			discussion.delete()
-			return Response(status=status.HTTP_204_NO_CONTENT)
-		# match deployed message for reproduction
-		return Response({'error': 'Forbidden: only the creator can delete this discussion.'}, status=status.HTTP_403_FORBIDDEN)
+		discussion.delete()
+		return Response(status=status.HTTP_204_NO_CONTENT)
+	return Response({'error': 'Forbidden: only the creator can delete this discussion.'}, status=status.HTTP_403_FORBIDDEN)
 
 # Comment Views
 @api_view(['GET', 'POST'])
