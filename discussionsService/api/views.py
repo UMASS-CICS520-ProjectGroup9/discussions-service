@@ -55,10 +55,8 @@ def discussion_detail(request, pk):
 			return Response(serializer.data)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 	elif request.method == 'DELETE':
-		if discussion.creator_id == getattr(request.user, 'id', None) or getattr(request.user, 'role', '').upper() == 'ADMIN':
-			discussion.delete()
-			return Response(status=status.HTTP_204_NO_CONTENT)
-		return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+		discussion.delete()
+		return Response(status=status.HTTP_204_NO_CONTENT)
 
 # Comment Views
 @api_view(['GET', 'POST'])
@@ -121,10 +119,8 @@ def comment_detail(request, pk):
 			return Response(serializer.data)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 	elif request.method == 'DELETE':
-		if comment.creator_id == getattr(request.user, 'id', None) or getattr(request.user, 'role', '').upper() == 'ADMIN':
-			comment.delete()
-			return Response(status=status.HTTP_204_NO_CONTENT)
-		return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+		comment.delete()
+		return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 # Course Discussion Views
