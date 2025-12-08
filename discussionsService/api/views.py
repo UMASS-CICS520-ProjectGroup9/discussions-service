@@ -7,7 +7,7 @@ from .serializers import DiscussionSerializer, CommentSerializer, CourseDiscussi
 
 # Discussion Views
 @api_view(['GET', 'POST'])
-@permission_classes([IsStudent])
+#@permission_classes([IsStudent])
 def discussion_list_create(request):
 	if request.method == 'GET':
 		discussions = Discussion.objects.all().order_by('-created_at')
@@ -62,7 +62,7 @@ def discussion_detail(request, pk):
 
 # Comment Views
 @api_view(['GET', 'POST'])
-@permission_classes([IsStudent])
+#@permission_classes([IsStudent])
 def comment_list_create(request):
 	if request.method == 'GET':
 		discussion_id = request.GET.get('discussion')
