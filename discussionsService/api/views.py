@@ -4,6 +4,10 @@ from rest_framework import status
 from .permissions import IsAdmin, IsStudent, IsStaff, IsOwnerOrAdmin
 from base.models import Discussion, Comment, CourseDiscussion, CourseComment
 from .serializers import DiscussionSerializer, CommentSerializer, CourseDiscussionSerializer, CourseCommentSerializer
+import logging
+
+# module logger — uses Django logging configuration when deployed
+logger = logging.getLogger(__name__)
 
 # Discussion Views
 @api_view(['GET', 'POST'])
@@ -54,10 +58,20 @@ def discussion_detail(request, pk):
 			return Response(serializer.data)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 	elif request.method == 'DELETE':
+		# debug: show who the server thinks is making the request and the discussion owner
+		logger.debug(
+			"[DEBUG] DELETE discussion=%s requested by user_id=%s role=%s; discussion.creator_id=%s",
+			pk,
+			getattr(request.user, 'id', None),
+			getattr(request.user, 'role', None),
+			discussion.creator_id,
+		)
+		# allow only the creator or an admin to delete
 		if discussion.creator_id == getattr(request.user, 'id', None) or getattr(request.user, 'role', '').upper() == 'ADMIN':
 			discussion.delete()
 			return Response(status=status.HTTP_204_NO_CONTENT)
-		return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+		# match deployed message for reproduction
+		return Response({'error': 'Forbidden: only the creator can delete this discussion.'}, status=status.HTTP_403_FORBIDDEN)
 
 # Comment Views
 @api_view(['GET', 'POST'])
