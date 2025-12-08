@@ -4,10 +4,6 @@ from rest_framework import status
 from .permissions import IsAdmin, IsStudent, IsStaff, IsOwnerOrAdmin
 from base.models import Discussion, Comment, CourseDiscussion, CourseComment
 from .serializers import DiscussionSerializer, CommentSerializer, CourseDiscussionSerializer, CourseCommentSerializer
-import logging
-
-# module logger — uses Django logging configuration when deployed
-logger = logging.getLogger(__name__)
 
 # Discussion Views
 @api_view(['GET', 'POST'])
@@ -38,16 +34,8 @@ def discussion_list_create(request):
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET', 'PUT', 'DELETE'])
+#@permission_classes([IsOwnerOrAdmin])
 def discussion_detail(request, pk):
-	# log entry for diagnostics: method, auth header (if any), and user info
-	logger.debug(
-		"ENTER discussion_detail pk=%s method=%s HTTP_AUTHORIZATION=%s user_id=%s role=%s",
-		pk,
-		getattr(request, 'method', None),
-		request.META.get('HTTP_AUTHORIZATION'),
-		getattr(request.user, 'id', None),
-		getattr(request.user, 'role', None),
-	)
 	try:
 		discussion = Discussion.objects.get(pk=pk)
 	except Discussion.DoesNotExist:
@@ -67,28 +55,10 @@ def discussion_detail(request, pk):
 			return Response(serializer.data)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 	elif request.method == 'DELETE':
-		# debug: show who the server thinks is making the request and the discussion owner
-		# log at WARNING so the message appears in production logs (INFO may be suppressed)
-		logger.warning(
-			"[WARN] DELETE discussion=%s requested by user_id=%s role=%s; discussion.creator_id=%s",
-			pk,
-			getattr(request.user, 'id', None),
-			getattr(request.user, 'role', None),
-			discussion.creator_id,
-		)
-		# allow only the creator or an admin to delete
-		discussion.delete()
-		return Response(status=status.HTTP_204_NO_CONTENT)
-	# include request.user id and role in the 403 response to help debugging in prod
-	return Response(
-		{
-			'error': 'Forbidden: only the creator can delete this discussion.',
-			'request_user_id': getattr(request.user, 'id', None),
-			'request_user_role': getattr(request.user, 'role', None),
-			'discussion_creator_id': discussion.creator_id,
-		},
-		status=status.HTTP_403_FORBIDDEN,
-	)
+		if discussion.creator_id == getattr(request.user, 'id', None) or getattr(request.user, 'role', '').upper() == 'ADMIN':
+			discussion.delete()
+			return Response(status=status.HTTP_204_NO_CONTENT)
+		return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
 
 # Comment Views
 @api_view(['GET', 'POST'])
@@ -130,6 +100,7 @@ def comment_list_create(request):
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET', 'PUT', 'DELETE'])
+#@permission_classes([IsOwnerOrAdmin])
 def comment_detail(request, pk):
 	try:
 		comment = Comment.objects.get(pk=pk)
