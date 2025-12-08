@@ -42,6 +42,7 @@ class DiscussionSerializer(serializers.ModelSerializer):
 
 class CourseCommentSerializer(serializers.ModelSerializer):
     created_at_display = serializers.SerializerMethodField()
+    discussion_title = serializers.CharField(source='discussion.title', read_only=True)
 
     class Meta:
         model = CourseComment
