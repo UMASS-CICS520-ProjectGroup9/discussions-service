@@ -152,3 +152,11 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Prevent Django CommonMiddleware from attempting to redirect non-GET requests
+# that are missing a trailing slash. Previously APPEND_SLASH was True by
+# default which causes a RuntimeError for DELETE/PUT/PATCH requests when
+# DEBUG=True. The application defines routes with trailing slashes —
+# clients should prefer using trailing slashes — but setting this to False
+# makes the server accept the non-slash form without raising during DEBUG.
+APPEND_SLASH = False

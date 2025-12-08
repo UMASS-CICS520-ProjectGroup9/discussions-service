@@ -52,6 +52,22 @@ class ExternalJWTAuthentication(BaseAuthentication):
         auth_header = request.headers.get("Authorization")
         print("53-auth_header: ", auth_header)
         if not auth_header:
+            # Fallback: allow the calling web frontend to pass lightweight user info
+            # via headers when a JWT is not available (e.g., server-side session auth).
+            # This is intentionally permissive for the dev environment used in the
+            # course project; in production you should require a verified token.
+            x_user_id = request.headers.get("X-User-ID")
+            if x_user_id:
+                try:
+                    user_id = int(x_user_id)
+                except (TypeError, ValueError):
+                    raise AuthenticationFailed("Invalid X-User-ID header")
+
+                role = request.headers.get("X-User-Role")
+                user = ExternalJWTUser(id=user_id, role=role)
+                # No token payload available in this fallback case
+                return (user, {})
+
             return None
 
         try:
