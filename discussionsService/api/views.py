@@ -39,6 +39,15 @@ def discussion_list_create(request):
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def discussion_detail(request, pk):
+	# log entry for diagnostics: method, auth header (if any), and user info
+	logger.debug(
+		"ENTER discussion_detail pk=%s method=%s HTTP_AUTHORIZATION=%s user_id=%s role=%s",
+		pk,
+		getattr(request, 'method', None),
+		request.META.get('HTTP_AUTHORIZATION'),
+		getattr(request.user, 'id', None),
+		getattr(request.user, 'role', None),
+	)
 	try:
 		discussion = Discussion.objects.get(pk=pk)
 	except Discussion.DoesNotExist:
