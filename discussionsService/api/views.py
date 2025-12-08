@@ -68,9 +68,9 @@ def discussion_detail(request, pk):
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 	elif request.method == 'DELETE':
 		# debug: show who the server thinks is making the request and the discussion owner
-		# log at INFO so the message appears in production logs (DEBUG may be suppressed)
-		logger.info(
-			"[INFO] DELETE discussion=%s requested by user_id=%s role=%s; discussion.creator_id=%s",
+		# log at WARNING so the message appears in production logs (INFO may be suppressed)
+		logger.warning(
+			"[WARN] DELETE discussion=%s requested by user_id=%s role=%s; discussion.creator_id=%s",
 			pk,
 			getattr(request.user, 'id', None),
 			getattr(request.user, 'role', None),
