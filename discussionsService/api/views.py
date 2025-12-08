@@ -34,7 +34,7 @@ def discussion_list_create(request):
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET', 'PUT', 'DELETE'])
-@permission_classes([IsOwnerOrAdmin])
+#@permission_classes([IsOwnerOrAdmin])
 def discussion_detail(request, pk):
 	try:
 		discussion = Discussion.objects.get(pk=pk)
@@ -55,8 +55,10 @@ def discussion_detail(request, pk):
 			return Response(serializer.data)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 	elif request.method == 'DELETE':
-		discussion.delete()
-		return Response(status=status.HTTP_204_NO_CONTENT)
+		if discussion.creator_id == getattr(request.user, 'id', None) or getattr(request.user, 'role', '').upper() == 'ADMIN':
+			discussion.delete()
+			return Response(status=status.HTTP_204_NO_CONTENT)
+		return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
 
 # Comment Views
 @api_view(['GET', 'POST'])
@@ -98,7 +100,7 @@ def comment_list_create(request):
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET', 'PUT', 'DELETE'])
-@permission_classes([IsOwnerOrAdmin])
+#@permission_classes([IsOwnerOrAdmin])
 def comment_detail(request, pk):
 	try:
 		comment = Comment.objects.get(pk=pk)
