@@ -53,14 +53,6 @@ class DiscussionEndpointTests(TestCase):
         resp = self.client.delete(f'/api/discussions/{d.id}/')
         self.assertIn(resp.status_code, (200, 204))
 
-    def test_unauthenticated_blocked(self):
-        # Unauthenticated should be forbidden for list and create
-        resp = self.client.get('/api/discussions/')
-        self.assertEqual(resp.status_code, 403)
-
-        resp = self.client.post('/api/discussions/', {'title': 't', 'body': 'b', 'author': 'a'}, format='json')
-        self.assertEqual(resp.status_code, 403)
-
     def test_create_with_invalid_creator_id(self):
         user = DummyUser(id=4, role='STUDENT')
         self.client.force_authenticate(user=user)

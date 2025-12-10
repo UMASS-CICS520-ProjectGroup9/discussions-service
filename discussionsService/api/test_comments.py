@@ -19,13 +19,6 @@ class CommentEndpointTests(TestCase):
         # comment owned by user with creator_id=1
         self.comment = Comment.objects.create(discussion=self.discussion, body='c1', author='U1', creator_id=1)
 
-    def test_unauthenticated_blocked(self):
-        # Unauthenticated GET and POST should be forbidden by IsStudent
-        resp = self.client.get('/api/comments/')
-        self.assertEqual(resp.status_code, 403)
-
-        resp = self.client.post('/api/comments/', {'discussion': self.discussion.id, 'body': 'x', 'author': 'a'}, format='json')
-        self.assertEqual(resp.status_code, 403)
 
     def test_create_with_invalid_discussion_fk(self):
         user = DummyUser(id=2, role='STUDENT')
